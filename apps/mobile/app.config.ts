@@ -124,11 +124,36 @@ const iosBundleIdentifier = isIosPersonalTeamBuild
   ? personalTeamBundleIdentifier!
   : variant.iosBundleIdentifier;
 
-const dmSansFonts = {
-  regular: "@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
-  medium: "@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
-  bold: "@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
+// Custom fonts: Feixen Standard (text/UI) and Geist Standard (code).
+const feixenFonts = {
+  regular: "./assets/fonts/FeixenStandard-Regular.ttf",
+  bold: "./assets/fonts/FeixenStandard-Bold.ttf",
+  italic: "./assets/fonts/FeixenStandard-Italic.ttf",
+  boldItalic: "./assets/fonts/FeixenStandard-BoldItalic.ttf",
 } as const;
+
+const geistFonts = {
+  regular: "./assets/fonts/GeistStandard-Regular.ttf",
+  bold: "./assets/fonts/GeistStandard-Bold.ttf",
+  italic: "./assets/fonts/GeistStandard-Italic.ttf",
+  boldItalic: "./assets/fonts/GeistStandard-BoldItalic.ttf",
+} as const;
+
+const allCustomFonts = [
+  feixenFonts.regular,
+  feixenFonts.bold,
+  feixenFonts.italic,
+  feixenFonts.boldItalic,
+  geistFonts.regular,
+  geistFonts.bold,
+  geistFonts.italic,
+  geistFonts.boldItalic,
+] as const;
+
+const androidFont = (fontFamily: string, path: string, weight: number) => ({
+  fontFamily,
+  fontDefinitions: [{ path, weight }],
+});
 
 const widgetsPlugin: NonNullable<ExpoConfig["plugins"]>[number] = [
   "expo-widgets",
@@ -330,22 +355,18 @@ const config: ExpoConfig = {
       "expo-font",
       {
         ios: {
-          fonts: [dmSansFonts.regular, dmSansFonts.medium, dmSansFonts.bold],
+          fonts: [...allCustomFonts],
         },
         android: {
           fonts: [
-            {
-              fontFamily: "DMSans-Regular",
-              fontDefinitions: [{ path: dmSansFonts.regular, weight: 400 }],
-            },
-            {
-              fontFamily: "DMSans-Medium",
-              fontDefinitions: [{ path: dmSansFonts.medium, weight: 500 }],
-            },
-            {
-              fontFamily: "DMSans-Bold",
-              fontDefinitions: [{ path: dmSansFonts.bold, weight: 700 }],
-            },
+            androidFont("FeixenStandard-Regular", feixenFonts.regular, 400),
+            androidFont("FeixenStandard-Bold", feixenFonts.bold, 700),
+            androidFont("FeixenStandard-Italic", feixenFonts.italic, 400),
+            androidFont("FeixenStandard-BoldItalic", feixenFonts.boldItalic, 700),
+            androidFont("GeistStandard-Regular", geistFonts.regular, 400),
+            androidFont("GeistStandard-Bold", geistFonts.bold, 700),
+            androidFont("GeistStandard-Italic", geistFonts.italic, 400),
+            androidFont("GeistStandard-BoldItalic", geistFonts.boldItalic, 700),
           ],
         },
       },
