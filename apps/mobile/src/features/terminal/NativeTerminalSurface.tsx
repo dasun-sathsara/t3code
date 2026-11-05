@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { AppText as Text } from "../../components/ui/AppText";
+import { CODE_FONT_FAMILY } from "../../lib/fontFamilies";
 import { MOBILE_TYPOGRAPHY } from "../../lib/typography";
 import { useAppearancePreferences } from "../settings/appearance/AppearancePreferencesProvider";
 import {
@@ -138,7 +139,7 @@ const FallbackTerminalSurface = memo(function FallbackTerminalSurface({
             selectable
             style={{
               color: theme.foreground,
-              fontFamily: "Menlo",
+              fontFamily: CODE_FONT_FAMILY,
               fontSize,
               lineHeight: Math.round(fontSize * 1.35),
             }}
@@ -166,7 +167,7 @@ const FallbackTerminalSurface = memo(function FallbackTerminalSurface({
           style={{
             color: theme.foreground,
             flex: 1,
-            fontFamily: "Menlo",
+            fontFamily: CODE_FONT_FAMILY,
             padding: 0,
           }}
           onSubmitEditing={(event) => {
