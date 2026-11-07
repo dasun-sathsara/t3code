@@ -140,6 +140,7 @@ export function useEnrichedLinkVariants(
                 paddingVertical: 2,
               },
               fontFamily: chipForeground ? FONT_FAMILIES.medium : textStyle.fontFamily,
+              ...(chipForeground ? { fontWeight: "500" as const } : {}),
               color: chipForeground ?? link.color ?? textStyle.fileTextColor,
               underline: false,
               backgroundColor: "transparent",
