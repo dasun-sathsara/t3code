@@ -155,6 +155,18 @@ const androidFont = (fontFamily: string, path: string, weight: number) => ({
   fontDefinitions: [{ path, weight }],
 });
 
+// The joined family registrations (400 + 700 (+ italic)) are what make
+// ordinary bold render the real cut. Android resolves fontWeight within
+// the family, so a family-name-only list synthesizes fake bold from the
+// regular cut instead.
+const androidFontFamily = (
+  fontFamily: string,
+  faces: Array<{ path: string; weight: number; style?: string }>,
+) => ({
+  fontFamily,
+  fontDefinitions: faces,
+});
+
 const widgetsPlugin: NonNullable<ExpoConfig["plugins"]>[number] = [
   "expo-widgets",
   {
@@ -359,6 +371,24 @@ const config: ExpoConfig = {
         },
         android: {
           fonts: [
+            androidFontFamily("FeixenStandard", [
+              { path: feixenFonts.regular, weight: 400 },
+              { path: feixenFonts.bold, weight: 500 },
+              { path: feixenFonts.bold, weight: 600 },
+              { path: feixenFonts.bold, weight: 700 },
+              { path: feixenFonts.bold, weight: 800 },
+              { path: feixenFonts.italic, weight: 400, style: "italic" },
+              { path: feixenFonts.boldItalic, weight: 700, style: "italic" },
+            ]),
+            androidFontFamily("GeistStandard", [
+              { path: geistFonts.regular, weight: 400 },
+              { path: geistFonts.bold, weight: 500 },
+              { path: geistFonts.bold, weight: 600 },
+              { path: geistFonts.bold, weight: 700 },
+              { path: geistFonts.bold, weight: 800 },
+              { path: geistFonts.italic, weight: 400, style: "italic" },
+              { path: geistFonts.boldItalic, weight: 700, style: "italic" },
+            ]),
             androidFont("FeixenStandard-Regular", feixenFonts.regular, 400),
             androidFont("FeixenStandard-Bold", feixenFonts.bold, 700),
             androidFont("FeixenStandard-Italic", feixenFonts.italic, 400),
