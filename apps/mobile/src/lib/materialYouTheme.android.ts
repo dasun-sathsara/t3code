@@ -97,7 +97,7 @@ export function materialYouPaletteToMobileThemeVariables(
     "--color-md-blockquote-border": withAlpha(palette.primary, dark ? 0.34 : 0.26),
     "--color-md-blockquote-bg": withAlpha(palette.primaryContainer, dark ? 0.14 : 0.2),
     "--color-md-code-bg": withAlpha(palette.onSurface, dark ? 0.08 : 0.06),
-    "--color-md-code-text": palette.onSurface,
+    "--color-md-code-text": palette.primary,
     "--color-md-user-code-bg": withAlpha(userBubbleForeground, dark ? 0.18 : 0.22),
     "--color-md-user-code-text": userBubbleForeground,
     "--color-md-user-fence-bg": withAlpha(userBubbleForeground, dark ? 0.14 : 0.18),

@@ -1559,7 +1559,7 @@ function useMarkdownStyles(): MarkdownStyleSets {
   const markdownBlockquoteBorder = theme["--color-md-blockquote-border"];
   const markdownCodeBg = theme["--color-md-code-bg"];
   const markdownCodeText = theme["--color-md-code-text"];
-  const markdownInlineCodeText = theme["--color-foreground-secondary"];
+  const markdownInlineCodeText = theme["--color-md-code-text"];
   const markdownHrColor = theme["--color-md-hr"];
   // Native chip drawing parses opaque hex only, and this role is translucent.
   const contextChipBorderColor = flattenThemeColor(
@@ -1569,7 +1569,6 @@ function useMarkdownStyles(): MarkdownStyleSets {
   const markdownUserBodyColor = theme["--color-user-bubble-foreground"];
   const markdownUserCodeBg = theme["--color-md-user-code-bg"];
   const markdownUserCodeText = theme["--color-md-user-code-text"];
-  const markdownUserInlineCodeText = theme["--color-user-bubble-foreground-muted"];
   const markdownUserFenceBg = theme["--color-md-user-fence-bg"];
   const regularFontFamily = FONT_FAMILIES.regular;
   const boldFontFamily = FONT_FAMILIES.bold;
@@ -1581,7 +1580,7 @@ function useMarkdownStyles(): MarkdownStyleSets {
         strongColor: markdownUserBodyColor,
         mutedColor: markdownUserBodyColor,
         linkColor: themeColorWithContrast(markdownLinkColor, theme["--color-user-bubble"]),
-        inlineCodeColor: markdownUserInlineCodeText,
+        inlineCodeColor: markdownUserCodeText,
         codeColor: markdownUserCodeText,
         codeBackgroundColor: markdownUserCodeBg,
         codeBlockBackgroundColor: markdownUserFenceBg,
