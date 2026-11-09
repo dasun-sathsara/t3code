@@ -188,7 +188,7 @@ export function createNativeReviewDiffTheme(
   if (scheme === "dark") {
     return {
       background,
-      text: nativeColor(appTheme["--color-md-code-text"]),
+      text: nativeColor(appTheme["--color-foreground"]),
       mutedText: nativeColor(appTheme["--color-foreground-muted"]),
       headerBackground: background,
       border: nativeColor(appTheme["--color-border"]),
@@ -205,7 +205,7 @@ export function createNativeReviewDiffTheme(
 
   return {
     background,
-    text: nativeColor(appTheme["--color-md-code-text"]),
+    text: nativeColor(appTheme["--color-foreground"]),
     mutedText: nativeColor(appTheme["--color-foreground-muted"]),
     headerBackground: background,
     border: nativeColor(appTheme["--color-border"]),
