@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
@@ -42,13 +43,14 @@ class AgentActivityExpiryReceiver : BroadcastReceiver() {
 
 /** Handles data pushes natively so delivery does not depend on a running JS bridge. */
 object AgentNotifications {
+  private const val TAG = "T3AgentNotifications"
   private const val STORE = "t3-agent-notifications"
   private const val ACTIVITY_CHANNEL = "agent-activity"
   private const val ALERT_CHANNEL = "agent-alerts"
   private const val ACTIVITY_TAG = "t3-agent-activity"
   private const val ALERT_TAG = "t3-agent-alert"
   private const val ACTIVITY_ID = 73001
-  private const val MAX_MESSAGE_AGE_MS = 10 * 60 * 1000L
+  private const val MAX_MESSAGE_AGE_MS = 24 * 60 * 60 * 1000L
   private const val RUNNING_LIFETIME_MS = 2 * 60 * 60 * 1000L
   private const val MAX_LIFETIME_MS = 24 * 60 * 60 * 1000L
 
@@ -119,17 +121,38 @@ object AgentNotifications {
   @Synchronized
   fun receive(context: Context, data: Map<String, String>) {
     val prefs = context.getSharedPreferences(STORE, Context.MODE_PRIVATE)
-    val updatedAt = data["updated_at"]?.toLongOrNull() ?: return
-    val registered = prefs.getBoolean("enabled", false) &&
-      data["device_id"] == prefs.getString("deviceId", null) &&
-      data["user_id"] == prefs.getString("userId", null)
-    val fresh = System.currentTimeMillis() - updatedAt in -MAX_MESSAGE_AGE_MS..MAX_MESSAGE_AGE_MS
-    if (registered && fresh && NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-      channels(context)
-      val scheme = prefs.getString("scheme", "t3code") ?: "t3code"
-      val alerted = showAlert(context, prefs, scheme, data)
-      updateActivity(context, prefs, data, updatedAt, alerted)
+    val updatedAt = data["updated_at"]?.toLongOrNull()
+    if (updatedAt == null) {
+      Log.w(TAG, "agent activity dropped: missing updated_at")
+      return
     }
+    val enabled = prefs.getBoolean("enabled", false)
+    // FCM already scoped this push to our own registration token, so a stale
+    // device id in the relay row must not hide the card. A different user is
+    // still dropped: that would leak another account's activity onto the phone.
+    val userMatch = data["user_id"] == prefs.getString("userId", null)
+    val deviceMatch = data["device_id"] == prefs.getString("deviceId", null)
+    // A late or clock-skewed timestamp still describes a real state; only an
+    // update older than the one already shown is stale. Absolute expiry is
+    // enforced separately, so the wall-clock window is a wide sanity bound.
+    val age = System.currentTimeMillis() - updatedAt
+    val fresh = age in -MAX_MESSAGE_AGE_MS..MAX_MESSAGE_AGE_MS
+    val notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+    if (!enabled || !userMatch || !fresh || !notificationsEnabled) {
+      Log.w(
+        TAG,
+        "agent activity dropped: enabled=$enabled userMatch=$userMatch deviceMatch=$deviceMatch " +
+          "fresh=$fresh ageMs=$age notificationsEnabled=$notificationsEnabled"
+      )
+      return
+    }
+    if (!deviceMatch) {
+      Log.w(TAG, "agent activity: device id differs from prefs; showing card for this token")
+    }
+    channels(context)
+    val scheme = prefs.getString("scheme", "t3code") ?: "t3code"
+    val alerted = showAlert(context, prefs, scheme, data)
+    updateActivity(context, prefs, data, updatedAt, alerted)
   }
 
   private fun showAlert(
@@ -232,6 +255,10 @@ object AgentNotifications {
     val covered = terminal?.takeIf { alerted && data["alert_path"] == data["activity_path"] }
     if (covered != null) coverTerminal(prefs, covered, updatedAt)
     if (updatedAt < prefs.getLong("lastUpdate", 0)) {
+      Log.w(
+        TAG,
+        "agent activity stale: updatedAt=$updatedAt lastUpdate=${prefs.getLong("lastUpdate", 0)}"
+      )
       // A newer replay of this same finish may already show the card.
       if (isCovered(prefs, prefs.getString("lastTerminal", null))) cancelActivity(context)
       return
@@ -244,15 +271,21 @@ object AgentNotifications {
       ?: if (active) updatedAt + RUNNING_LIFETIME_MS else 0L
     val remainingMs = (expiresAt - System.currentTimeMillis()).coerceAtMost(MAX_LIFETIME_MS)
     val wasActive = prefs.getBoolean("lastActive", false)
-    prefs.edit().putBoolean("lastActive", active).apply()
+    val lastPath = prefs.getString("lastActivityPath", null)
+    prefs.edit().putBoolean("lastActive", active)
+      .putString("lastActivityPath", data["activity_path"]).apply()
     if (remainingMs <= 0 || !prefs.getBoolean("ongoing", false)) {
       cancelActivity(context)
       prefs.edit().putBoolean("dismissed", false).apply()
       return
     }
-    // Dismissing a run includes its finished card. A new run, or toggling
-    // activity off/on, arms it again; terminal replays stay dismissed.
-    if (active && !wasActive) prefs.edit().putBoolean("dismissed", false).apply()
+    // Dismissing a run includes its finished card. A new run in any thread, or
+    // toggling activity off/on, arms it again; terminal replays stay dismissed.
+    // A different thread can start while another card is still active, so the
+    // path change must also re-arm instead of inheriting the old dismissal.
+    if (active && (!wasActive || lastPath != data["activity_path"])) {
+      prefs.edit().putBoolean("dismissed", false).remove("coveredTerminal").apply()
+    }
     if (prefs.getBoolean("dismissed", false) || isCovered(prefs, terminal)) {
       cancelActivity(context)
     } else {
