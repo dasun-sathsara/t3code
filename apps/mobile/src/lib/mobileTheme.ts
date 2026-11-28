@@ -331,6 +331,7 @@ export function createMobileThemeVariables(
 ) {
   const c = nativeColors(colors);
   const groupedCard = themeColorToNativeColor(groupedCardColor);
+  const userCodeBackground = withAlpha(c.messageForeground, 0.18);
   const textSurfaces = [
     c.canvas,
     c.surface,
@@ -421,8 +422,11 @@ export function createMobileThemeVariables(
     "--color-md-blockquote-bg": c.muted,
     "--color-md-code-bg": c.codeBackground,
     "--color-md-code-text": themeColorWithContrast(c.messageAction, c.codeBackground),
-    "--color-md-user-code-bg": withAlpha(c.messageForeground, 0.18),
-    "--color-md-user-code-text": themeColorWithContrast(c.messageAction, c.messageSurface),
+    "--color-md-user-code-bg": userCodeBackground,
+    "--color-md-user-code-text": themeColorWithContrast(c.messageAction, [
+      c.messageSurface,
+      flattenThemeColor(userCodeBackground, c.messageSurface),
+    ]),
     "--color-md-user-fence-bg": withAlpha("#000000", appearance === "dark" ? 0.28 : 0.16),
     "--color-md-user-fence-text": c.messageForeground,
     "--color-md-hr": c.border,

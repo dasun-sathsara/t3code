@@ -1,6 +1,11 @@
 import { Hct, argbFromHex, hexFromArgb } from "@material/material-color-utilities";
 
-import type { MobileThemeAppearance, MobileThemeVariables } from "./mobileTheme";
+import {
+  flattenThemeColor,
+  themeColorWithContrast,
+  type MobileThemeAppearance,
+  type MobileThemeVariables,
+} from "./mobileTheme";
 import type { MaterialYouPalette } from "./materialYouPalette";
 
 function withAlpha(color: string, alpha: number): string {
@@ -29,6 +34,8 @@ export function materialYouPaletteToMobileThemeVariables(
   const dark = appearance === "dark";
   const userBubble = dark ? materialTone(palette.inversePrimary, 30) : palette.primary;
   const userBubbleForeground = dark ? materialTone(palette.inversePrimary, 90) : palette.onPrimary;
+
+  const codeBackground = withAlpha(palette.onSurface, dark ? 0.08 : 0.06);
 
   return {
     ...base,
@@ -96,8 +103,11 @@ export function materialYouPaletteToMobileThemeVariables(
     "--color-md-link": palette.primary,
     "--color-md-blockquote-border": withAlpha(palette.primary, dark ? 0.34 : 0.26),
     "--color-md-blockquote-bg": withAlpha(palette.primaryContainer, dark ? 0.14 : 0.2),
-    "--color-md-code-bg": withAlpha(palette.onSurface, dark ? 0.08 : 0.06),
-    "--color-md-code-text": palette.primary,
+    "--color-md-code-bg": codeBackground,
+    "--color-md-code-text": themeColorWithContrast(palette.primary, [
+      palette.surface,
+      flattenThemeColor(codeBackground, palette.surface),
+    ]),
     "--color-md-user-code-bg": withAlpha(userBubbleForeground, dark ? 0.18 : 0.22),
     "--color-md-user-code-text": userBubbleForeground,
     "--color-md-user-fence-bg": withAlpha(userBubbleForeground, dark ? 0.14 : 0.18),
