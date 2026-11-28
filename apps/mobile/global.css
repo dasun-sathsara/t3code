@@ -10,7 +10,10 @@
       --font-mono: "ui-monospace";
     }
     @variant android {
-      --font-mono: "monospace";
+      --font-mono: "GeistStandard";
+      --font-sans: "FeixenStandard";
+      --font-medium: "FeixenStandard-Bold";
+      --font-bold: "FeixenStandard-Bold";
     }
   }
 }

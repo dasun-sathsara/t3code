@@ -90,11 +90,15 @@ class T3ContextChip(
   companion object {
     private const val DM_SANS_MEDIUM = "DMSans-Medium"
 
-    /** Matches the iOS chips: DM Sans text gets DM Sans Medium, anything else the platform medium. */
     fun typefaceFor(fontFamily: String): Typeface {
       val fonts = ReactFontManager.getInstance()
-      return if (fontFamily.startsWith("DMSans") && DM_SANS_MEDIUM in fonts.customFontFamilies) {
-        fonts.getTypeface(DM_SANS_MEDIUM, Typeface.NORMAL, null)
+      val mediumFamily = when {
+        fontFamily == "FeixenStandard" -> "FeixenStandard-Bold"
+        fontFamily.startsWith("DMSans") -> DM_SANS_MEDIUM
+        else -> null
+      }
+      return if (mediumFamily != null && mediumFamily in fonts.customFontFamilies) {
+        fonts.getTypeface(mediumFamily, Typeface.NORMAL, null)
       } else {
         Typeface.create("sans-serif-medium", Typeface.NORMAL)
       }

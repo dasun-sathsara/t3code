@@ -135,6 +135,24 @@ const mesloFonts = {
   bold: "./assets/fonts/MesloLGS-NF-Bold.ttf",
 } as const;
 
+function androidStandardFont(fontFamily: string) {
+  const regular = `./assets/fonts/${fontFamily}-Regular.ttf`;
+  const bold = `./assets/fonts/${fontFamily}-Bold.ttf`;
+  const italic = `./assets/fonts/${fontFamily}-Italic.ttf`;
+  const boldItalic = `./assets/fonts/${fontFamily}-BoldItalic.ttf`;
+
+  // The Standard cuts have no medium face. Use the bold cut for weight 500 and up.
+  return {
+    fontFamily,
+    fontDefinitions: [
+      { path: regular, weight: 400 },
+      ...[500, 600, 700, 800].map((weight) => ({ path: bold, weight })),
+      { path: italic, weight: 400, style: "italic" },
+      { path: boldItalic, weight: 700, style: "italic" },
+    ],
+  };
+}
+
 const widgetsPlugin: NonNullable<ExpoConfig["plugins"]>[number] = [
   "expo-widgets",
   {
@@ -349,6 +367,16 @@ const config: ExpoConfig = {
         },
         android: {
           fonts: [
+            androidStandardFont("FeixenStandard"),
+            androidStandardFont("GeistStandard"),
+            {
+              fontFamily: "FeixenStandard-Bold",
+              // Some native labels request a family without passing a weight.
+              fontDefinitions: [400, 500, 700, 800].map((weight) => ({
+                path: "./assets/fonts/FeixenStandard-Bold.ttf",
+                weight,
+              })),
+            },
             {
               fontFamily: "DMSans-Regular",
               fontDefinitions: [{ path: dmSansFonts.regular, weight: 400 }],

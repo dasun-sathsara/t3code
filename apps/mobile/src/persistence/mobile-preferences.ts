@@ -20,7 +20,12 @@ import {
 } from "@t3tools/contracts";
 import { ToolCallVisibility } from "@t3tools/contracts/settings";
 import type { AndroidNavigationStyle } from "../lib/androidNavigationStyle";
-import type { MobileFontId, MobileMonoFontId } from "../lib/fontFamilies";
+import {
+  isMobileFontId,
+  isMobileMonoFontId,
+  type MobileFontId,
+  type MobileMonoFontId,
+} from "../lib/fontFamilies";
 import type { ComposerEnterBehavior } from "../lib/composerEnterBehavior";
 import type { FollowUpBehavior } from "../lib/followUpBehavior";
 import { isMicrophoneKind, type MicrophoneEntry } from "../lib/microphonePriority";
@@ -346,8 +351,8 @@ function sanitizePreferences(parsed: Preferences): Preferences {
     preferences.androidNavigationStyle = parsed.androidNavigationStyle;
   }
   if (typeof parsed.baseFontSize === "number") preferences.baseFontSize = parsed.baseFontSize;
-  if (parsed.fontId === "system" || parsed.fontId === "dm-sans") preferences.fontId = parsed.fontId;
-  if (parsed.monoFontId === "system" || parsed.monoFontId === "meslo") {
+  if (isMobileFontId(parsed.fontId)) preferences.fontId = parsed.fontId;
+  if (isMobileMonoFontId(parsed.monoFontId)) {
     preferences.monoFontId = parsed.monoFontId;
   }
   if (typeof parsed.terminalFontSize === "number" || parsed.terminalFontSize === null) {

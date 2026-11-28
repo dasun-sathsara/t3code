@@ -25,7 +25,7 @@ interface FontChoice<Id extends string> {
   readonly detail?: string;
 }
 
-const FONT_CHOICES: ReadonlyArray<FontChoice<MobileFontId>> = [
+const FONT_CHOICES: Array<FontChoice<MobileFontId>> = [
   {
     id: "system",
     label: msg("System", { $context: "font choice: the device's own system font" }),
@@ -34,8 +34,14 @@ const FONT_CHOICES: ReadonlyArray<FontChoice<MobileFontId>> = [
   },
   { id: "dm-sans", label: msg("DM Sans", { $context: "font choice: the DM Sans typeface name" }) },
 ];
+if (Platform.OS === "android") {
+  FONT_CHOICES.push({
+    id: "feixen-standard",
+    label: msg("Feixen Standard", { $context: "font choice: the Feixen Standard typeface name" }),
+  });
+}
 
-const MONO_FONT_CHOICES: ReadonlyArray<FontChoice<MobileMonoFontId>> = [
+const MONO_FONT_CHOICES: Array<FontChoice<MobileMonoFontId>> = [
   {
     id: "system",
     label: msg("System", { $context: "font choice: the device's own system font" }),
@@ -49,6 +55,13 @@ const MONO_FONT_CHOICES: ReadonlyArray<FontChoice<MobileMonoFontId>> = [
     }),
   },
 ];
+
+if (Platform.OS === "android") {
+  MONO_FONT_CHOICES.push({
+    id: "geist-standard",
+    label: msg("Geist Standard", { $context: "font choice: the Geist Standard typeface name" }),
+  });
+}
 
 function FontMenuRow<Id extends string>(props: {
   readonly disabled: boolean;

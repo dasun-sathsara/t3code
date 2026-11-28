@@ -37,6 +37,23 @@ describe("mobileThemeRuntime", () => {
     });
   });
 
+  it("applies the bundled Standard font families when selected", () => {
+    const operations = createMobileThemeRuntimeOperations(initialState, {
+      ...initialState,
+      fontId: "feixen-standard",
+      monoFontId: "geist-standard",
+    });
+    expect(operations[0]).toMatchObject({
+      kind: "update-text-variables",
+      variables: {
+        "--font-sans": "FeixenStandard",
+        "--font-medium": "FeixenStandard-Bold",
+        "--font-bold": "FeixenStandard-Bold",
+        "--font-mono": "GeistStandard",
+      },
+    });
+  });
+
   it("swaps the mono family variable when the mono font changes", () => {
     const operations = createMobileThemeRuntimeOperations(initialState, {
       ...initialState,
